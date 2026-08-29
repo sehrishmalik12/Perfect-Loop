@@ -1,0 +1,480 @@
+/* ===========================================================
+   PASTEL BLOOM — stylesheet
+   Palette:  #ffe6f2 / #ffc2e0 / #ffa8d1  (pastel pink wash)
+             #ff8fc7 hot-pink · #ffb3e6 fuchsia · #d6b3f5 lilac · #9be9ea cyan
+             #5c2748 ink (deep berry, for contrast text)
+   Fonts:    Orbitron (display / futuristic) + Quicksand (body / soft)
+   =========================================================== */
+
+:root {
+  --bg-1: #ffe6f2;
+  --bg-2: #ffc2e0;
+  --bg-3: #ffa8d1;
+
+  --ink: #5c2748;
+  --ink-soft: #9a5680;
+
+  --panel: rgba(255, 255, 255, 0.55);
+  --panel-strong: rgba(255, 255, 255, 0.8);
+  --panel-border: rgba(255, 255, 255, 0.85);
+
+  --pink: #ff8fc7;
+  --fuchsia: #ffb3e6;
+  --lilac: #d6b3f5;
+  --cyan: #9be9ea;
+  --glow: #ffd1ea;
+
+  --shadow-soft: 0 8px 30px rgba(214, 90, 160, 0.2);
+  --radius-lg: 26px;
+  --radius-md: 18px;
+
+  --font-display: "Orbitron", "Segoe UI", sans-serif;
+  --font-body: "Quicksand", "Segoe UI", sans-serif;
+}
+
+/* -----------------------------------------------------------
+   Reset & base — kept minimal so behaviour stays predictable
+   across browsers / operating systems.
+   ----------------------------------------------------------- */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html, body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  min-height: 100dvh;
+  font-family: var(--font-body);
+  color: var(--ink);
+  background: linear-gradient(150deg, var(--bg-1) 0%, var(--bg-2) 45%, var(--bg-3) 100%);
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+  background: none;
+  color: inherit;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Consistent, visible focus ring for keyboard users on every platform */
+button:focus-visible {
+  outline: 3px solid var(--lilac);
+  outline-offset: 3px;
+}
+
+/* -----------------------------------------------------------
+   Decorative background: holographic grid + scanline sweep
+   ----------------------------------------------------------- */
+.bg-grid {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(rgba(255, 143, 199, 0.25) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 143, 199, 0.25) 1px, transparent 1px);
+  background-size: 42px 42px;
+  mask-image: radial-gradient(ellipse 80% 60% at 50% 30%, black 40%, transparent 90%);
+  -webkit-mask-image: radial-gradient(ellipse 80% 60% at 50% 30%, black 40%, transparent 90%);
+}
+
+.scanline {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: linear-gradient(
+    to bottom,
+    transparent 0%,
+    rgba(255, 255, 255, 0.4) 48%,
+    transparent 100%
+  );
+  height: 140px;
+  animation: scan 9s linear infinite;
+  opacity: 0.6;
+}
+
+@keyframes scan {
+  0%   { transform: translateY(-140px); }
+  100% { transform: translateY(100vh); }
+}
+
+.floating-orbs {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.float-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(2px);
+  opacity: 0.5;
+  animation: drift 16s ease-in-out infinite;
+}
+
+.f1 { width: 90px;  height: 90px;  left: 8%;  top: 70%;  background: var(--pink);    animation-duration: 18s; }
+.f2 { width: 60px;  height: 60px;  left: 85%; top: 20%;  background: var(--fuchsia); animation-duration: 14s; }
+.f3 { width: 130px; height: 130px; left: 75%; top: 75%;  background: var(--lilac);   animation-duration: 22s; }
+.f4 { width: 45px;  height: 45px;  left: 15%; top: 15%;  background: var(--cyan);    animation-duration: 12s; }
+.f5 { width: 70px;  height: 70px;  left: 45%; top: 85%;  background: var(--glow);    animation-duration: 20s; }
+
+@keyframes drift {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50%      { transform: translate(20px, -30px) scale(1.08); }
+}
+
+/* -----------------------------------------------------------
+   Layout shell
+   ----------------------------------------------------------- */
+.app {
+  position: relative;
+  z-index: 2;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: clamp(16px, 4vw, 36px);
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(14px, 3vw, 24px);
+}
+
+/* -----------------------------------------------------------
+   HUD / header
+   ----------------------------------------------------------- */
+.hud {
+  text-align: center;
+}
+
+.title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 900;
+  letter-spacing: 0.06em;
+  font-size: clamp(28px, 6vw, 48px);
+  color: var(--ink);
+  text-shadow: 0 0 18px rgba(255, 179, 230, 0.6);
+}
+
+.title span {
+  background: linear-gradient(90deg, var(--pink), var(--fuchsia), var(--lilac));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.subtitle {
+  margin: 6px 0 18px;
+  font-family: var(--font-display);
+  font-size: clamp(11px, 2.4vw, 13px);
+  letter-spacing: 0.25em;
+  color: var(--ink-soft);
+  text-transform: uppercase;
+}
+
+.stats {
+  display: flex;
+  justify-content: center;
+  gap: clamp(8px, 2.5vw, 16px);
+  flex-wrap: wrap;
+}
+
+.stat-card {
+  min-width: 84px;
+  padding: 10px 16px;
+  border-radius: var(--radius-md);
+  background: var(--panel);
+  border: 1px solid var(--panel-border);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  box-shadow: var(--shadow-soft);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.stat-label {
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+
+.stat-value {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(16px, 3vw, 20px);
+  margin-top: 2px;
+}
+
+#combo {
+  color: var(--pink);
+}
+
+/* -----------------------------------------------------------
+   Game arena
+   ----------------------------------------------------------- */
+.arena-wrap {
+  flex: 1;
+  display: flex;
+}
+
+.arena {
+  position: relative;
+  flex: 1;
+  min-height: min(62vh, 520px);
+  border-radius: var(--radius-lg);
+  background: var(--panel);
+  border: 1px solid var(--panel-border);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  box-shadow: var(--shadow-soft), inset 0 0 60px rgba(255, 255, 255, 0.45);
+  overflow: hidden;
+  touch-action: manipulation;
+}
+
+/* -----------------------------------------------------------
+   Bloom orbs — the signature element
+   ----------------------------------------------------------- */
+.orb {
+  position: absolute;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  animation: pop-in 220ms ease-out;
+  transition: transform 120ms ease, opacity 180ms ease;
+}
+
+.orb:active {
+  transform: scale(0.9);
+}
+
+.orb.popped {
+  opacity: 0;
+  transform: scale(1.5);
+}
+
+.orb-pink    { background: radial-gradient(circle at 35% 30%, #ffffff, var(--pink) 70%);    box-shadow: 0 0 22px rgba(255, 143, 199, 0.9); }
+.orb-fuchsia { background: radial-gradient(circle at 35% 30%, #ffffff, var(--fuchsia) 70%); box-shadow: 0 0 22px rgba(255, 179, 230, 0.9); }
+.orb-lilac   { background: radial-gradient(circle at 35% 30%, #ffffff, var(--lilac) 70%);   box-shadow: 0 0 22px rgba(214, 179, 245, 0.9); }
+.orb-cyan    { background: radial-gradient(circle at 35% 30%, #ffffff, var(--cyan) 70%);    box-shadow: 0 0 22px rgba(155, 233, 234, 0.9); }
+
+@keyframes pop-in {
+  from { transform: scale(0.3); opacity: 0; }
+  to   { transform: scale(1);   opacity: 1; }
+}
+
+/* Shrinking ring shows remaining lifetime; duration is set inline
+   per-orb via the --lifetime custom property in JS. */
+.orb-ring {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  border: 3px solid rgba(255, 255, 255, 0.9);
+  box-sizing: border-box;
+  animation: shrink-ring var(--lifetime, 1800ms) linear forwards;
+}
+
+@keyframes shrink-ring {
+  from { transform: scale(1);   opacity: 0.9; }
+  to   { transform: scale(0.15); opacity: 0; }
+}
+
+/* -----------------------------------------------------------
+   Sparkle burst — plays when an orb is caught (interactivity)
+   ----------------------------------------------------------- */
+.sparkle-burst {
+  position: absolute;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+
+.sparkle-burst i {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--fuchsia);
+  box-shadow: 0 0 8px rgba(255, 179, 230, 0.9);
+  transform: rotate(var(--angle)) translateX(0);
+  opacity: 1;
+  animation: burst-out 480ms ease-out forwards;
+}
+
+@keyframes burst-out {
+  from { transform: rotate(var(--angle)) translateX(0); opacity: 1; }
+  to   { transform: rotate(var(--angle)) translateX(34px); opacity: 0; }
+}
+
+/* -----------------------------------------------------------
+   Overlays (start screen / game over screen)
+   ----------------------------------------------------------- */
+.overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  overflow-y: auto;
+  background: rgba(255, 230, 242, 0.6);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  transition: opacity 200ms ease;
+}
+
+.overlay.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.overlay-card {
+  max-width: 440px;
+  width: 100%;
+  text-align: center;
+  padding: clamp(22px, 5vw, 34px);
+  margin: auto;
+  border-radius: var(--radius-lg);
+  background: var(--panel-strong);
+  border: 1px solid var(--panel-border);
+  box-shadow: var(--shadow-soft);
+}
+
+.eyebrow {
+  margin: 0 0 6px;
+  font-family: var(--font-display);
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--pink);
+}
+
+.overlay-card h2 {
+  margin: 0 0 10px;
+  font-family: var(--font-display);
+  font-size: clamp(20px, 4vw, 26px);
+}
+
+.overlay-card .desc {
+  margin: 0 0 18px;
+  color: var(--ink-soft);
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+#finalScore {
+  color: var(--ink);
+  font-weight: 700;
+}
+
+/* How-to-play instructions list on the start screen */
+.how-to-play {
+  margin: 0 0 22px;
+  padding: 14px 16px 14px 34px;
+  text-align: left;
+  list-style: disc;
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: var(--ink-soft);
+  background: rgba(255, 255, 255, 0.5);
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-md);
+}
+
+.how-to-play li + li {
+  margin-top: 4px;
+}
+
+.how-to-play strong {
+  color: var(--ink);
+}
+
+.btn-primary {
+  padding: 12px 30px;
+  border-radius: 999px;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink);
+  background: linear-gradient(90deg, var(--pink), var(--fuchsia), var(--lilac));
+  box-shadow: 0 6px 20px rgba(255, 179, 230, 0.6);
+  transition: transform 150ms ease, box-shadow 150ms ease;
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 26px rgba(255, 179, 230, 0.75);
+}
+
+.btn-primary:active {
+  transform: translateY(0);
+}
+
+/* -----------------------------------------------------------
+   Footer
+   ----------------------------------------------------------- */
+.footer-note {
+  text-align: center;
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  color: var(--ink-soft);
+}
+
+.footer-note span {
+  font-family: var(--font-display);
+  color: var(--pink);
+}
+
+/* -----------------------------------------------------------
+   Responsive tweaks — phones / tablets / desktop
+   ----------------------------------------------------------- */
+@media (max-width: 480px) {
+  .stats {
+    gap: 8px;
+  }
+  .stat-card {
+    min-width: 70px;
+    padding: 8px 10px;
+  }
+  .orb {
+    width: 48px;
+    height: 48px;
+  }
+}
+
+@media (min-width: 900px) {
+  .arena {
+    min-height: 560px;
+  }
+}
+
+/* -----------------------------------------------------------
+   Respect reduced-motion preferences (accessibility, cross-OS)
+   ----------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  .scanline,
+  .float-orb,
+  .orb,
+  .sparkle-burst i {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
